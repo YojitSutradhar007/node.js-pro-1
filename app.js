@@ -9,12 +9,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 
 const productRouts = require('./api/routes/products');
-const orderRouts = require('./api/routes/order');
+const orderRouts = require('./api/routes/orders');
+const user = require('./api/routes/users');
+
 
 mongoose.connect('mongodb+srv://jimmysuthar08:jimmysuthar08@learningrest.rdlntht.mongodb.net/?retryWrites=true&w=majority');// connceting with mongodb
 app.use(morgan('dev'));// showing that which type of request is called
 app.use('/product', productRouts);
 app.use('/order', orderRouts);
+app.use('/user', user);
+
 
 app.use((req, res, next) => {
     const error = new Error('not found');

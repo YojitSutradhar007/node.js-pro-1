@@ -23,7 +23,9 @@ router.get('/', (req, res, next) => {
         res.status(200).json(respone);
     }).catch(err => console.log(err));
 });
- 
+
+
+
 router.post('/', (req, res, next) => {
     const addProduct = new Products({
         _id: new mongoose.Types.ObjectId(),
