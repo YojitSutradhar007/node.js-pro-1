@@ -5,13 +5,17 @@ const mongoose = require('mongoose');
 const app = express();
 
 app.use(bodyParser.json());// show that which type of data in coming from body 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-
+    
 const productRouts = require('./api/routes/products');
 const orderRouts = require('./api/routes/orders');
 const user = require('./api/routes/users');
-
+app.use((req,res,next)=>{
+    console.log("Server is running")
+    // this is middleware if don't use the "next()" then it will not pass through next middleware on stack it will stuck on the same middleware
+    next();
+})
 
 mongoose.connect('mongodb+srv://jimmysuthar08:jimmysuthar08@learningrest.rdlntht.mongodb.net/?retryWrites=true&w=majority');// connceting with mongodb
 app.use(morgan('dev'));// showing that which type of request is called
