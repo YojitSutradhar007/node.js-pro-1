@@ -4,12 +4,14 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const bcrypt = require('bcrypt');// Use to store the user password in hash format 
 const jwt = require('jsonwebtoken');
+
+
 router.post("/signup", (req, res, next) => {
 
     User.find({ email: req.body.email }).then(user => {
         console.log(user);
-        if (user.length>0) {
-             res.status(400).json({
+        if (user.length > 0) {
+            res.status(400).json({
                 message: "Mail already exist"
             })
 
@@ -21,7 +23,7 @@ router.post("/signup", (req, res, next) => {
                     })
                 }
                 else {
-                    const jwtToken=jwt.sign({email:req.body.email},"secret",{expiresIn:"1h"});
+                    const jwtToken = jwt.sign({ email: req.body.email }, "secret", { expiresIn: "1h" });
 
                     const addUser = User({
                         _id: new mongoose.Types.ObjectId(),
@@ -46,10 +48,50 @@ router.post("/signup", (req, res, next) => {
 
         }
     })
+});
+
+
+
+router.post("/login", (req, res, next) => {
+
+    User.find({ email: req.body.email }).then(user => {
+        console.log(user);
+        if (user.length == 0) {
+
+            return res.status(401).json({
+                message: "Auth Failed first",
+            })
+
+
+
+        } else {
+            bcrypt.compare(req.body.password, user[0].password, (error, result) => {
+                if (error) {
+                   return  res.status(401).send({
+                        message: "Auth Failed Second",
+                    });
+                }
+
+                if (result) {
+                    const jwtToken = jwt.sign({ email: req.body.email }, "secret", { expiresIn: "1h" });
+
+                    return res.status(200).json({
+                        message: "Auth Success",
+                        token: jwtToken
+                    })
+                }
+
+
+                return res.status(401).json({ message: "Auth Failure" });
+            })
+
+        }
+    })
 })
 
 
 router.get('/', (req, res, next) => {
+
     User.find().select().exec().then(doc => {
         console.log(doc);
         const respone = {
@@ -69,4 +111,5 @@ router.get('/', (req, res, next) => {
         res.status(200).json(respone);
     }).catch(err => console.log(err));
 });
+
 module.exports = router;

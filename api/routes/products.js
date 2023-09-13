@@ -1,7 +1,24 @@
 const express = require('express');
 const Products = require('../models/product');
+const Productasdsds = require('../../uploads');
+
 const mongoose = require('mongoose');
 const router = express();
+const multer = require('multer');
+// const upload = mullter({ dest: 'uploads/' })
+
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './uploads/')
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, file.fieldname + '-' + uniqueSuffix+file.originalname);
+    }
+})
+
+const upload = multer({ storage: storage })
 
 router.get('/', (req, res, next) => {
     Products.find().select("name price _id").exec().then(doc => {
@@ -26,7 +43,8 @@ router.get('/', (req, res, next) => {
 
 
 
-router.post('/', (req, res, next) => {
+router.post('/', upload.single('productImage'), (req, res, next) => {
+    console.log(req.file);
     const addProduct = new Products({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
@@ -40,12 +58,12 @@ router.post('/', (req, res, next) => {
     res.status(201).json({
         message: "Create Product Scucessfully",
         createProduct: {
-            name:addProduct.name,
-            price:addProduct.price,
-            id:addProduct.id,
-            request:{
-                type:"GET",
-                url:"http://localhost:3000/product/" + addProduct._id
+            name: addProduct.name,
+            price: addProduct.price,
+            id: addProduct.id,
+            request: {
+                type: "GET",
+                url: "http://localhost:3000/product/" + addProduct._id
             }
         }
     });
