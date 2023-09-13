@@ -1,7 +1,6 @@
 const express = require('express');
 const Products = require('../models/product');
-const Productasdsds = require('../../uploads');
-
+const CheckAuth = require('../middleware/check_auth')
 const mongoose = require('mongoose');
 const router = express();
 const multer = require('multer');
@@ -14,7 +13,7 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        cb(null, file.fieldname + '-' + uniqueSuffix+file.originalname);
+        cb(null, file.fieldname + '-' + uniqueSuffix + file.originalname);
     }
 })
 
@@ -43,7 +42,7 @@ router.get('/', (req, res, next) => {
 
 
 
-router.post('/', upload.single('productImage'), (req, res, next) => {
+router.post('/', upload.single('productImage'), CheckAuth.checkAuth, (req, res, next) => {
     console.log(req.file);
     const addProduct = new Products({
         _id: new mongoose.Types.ObjectId(),
